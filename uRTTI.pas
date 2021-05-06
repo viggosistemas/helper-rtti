@@ -111,11 +111,11 @@ var
   LRTTIProperty  : TRttiProperty;
   LRTTIAttributes: TCustomAttribute;
 begin
+  Result := TDictionary<String, String>.Create;
   FRTTIType  := FRTTIContext.GetType( TObject( AObject ).ClassType );
 
   for LRTTIField in FRTTIType.GetFields do
   begin
-    Result := TDictionary<String, String>.Create;
     for LRTTIAttributes in  LRTTIField.GetAttributes do
       if LRTTIAttributes is Search  then
         Result.AddOrSetValue(Search(LRTTIAttributes).Title, Search(LRTTIAttributes).KeyWord);
