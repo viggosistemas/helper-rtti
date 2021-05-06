@@ -53,7 +53,7 @@ type
       FKeyWord  : String;
       FValue    : String;
     public
-      property Titile  : String read FTitle write FTitle;
+      property Title   : String read FTitle write FTitle;
       property KeyWord : String read FKeyWord write FKeyWord;
       property Value   : String read FValue   write FValue;
   end;
