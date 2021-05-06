@@ -53,6 +53,7 @@ implementation
 
 { TRTTI }
 
+
 constructor TRTTI.Create;
 begin
   FRTTIContext := TRttiContext.Create;
@@ -82,25 +83,31 @@ begin
 
   FRTTIType  := FRTTIContext.GetType( TObject( AObject ).ClassType );
 
-  LRTTIField := FRTTIType.GetField( AField );
-
-  if LRTTIField <> nil then
+  if AField <> '' then
   begin
 
-    for LRTTIAttributes in  LRTTIField.GetAttributes do
+    LRTTIField := FRTTIType.GetField( AField );
+
+    if LRTTIField <> nil then
     begin
-      if LRTTIAttributes is Search  then
-        Result := Search(LRTTIAttributes).Value;
 
-      if LRTTIAttributes is NumberOnly  then
-        Result := Result + Search(LRTTIAttributes).Value + '::::varchar';
+      for LRTTIAttributes in  LRTTIField.GetAttributes do
+      begin
+        if LRTTIAttributes is Search then
+          Result := Search(LRTTIAttributes).Value;
 
-      if LRTTIAttributes is DateOnly then
-        Result := 'to_char(' + Result + ', ''DD/MM/YYYY'')'
+        if LRTTIAttributes is NumberOnly  then
+          Result := Result + '::::varchar';
+
+        if LRTTIAttributes is DateOnly then
+          Result := 'to_char(' + Result + ', ''DD/MM/YYYY'')';
+
+      end;
 
     end;
 
   end;
+
 
 end;
 
@@ -112,6 +119,7 @@ var
   LRTTIAttributes: TCustomAttribute;
 begin
   Result := TDictionary<String, String>.Create;
+
   FRTTIType  := FRTTIContext.GetType( TObject( AObject ).ClassType );
 
   for LRTTIField in FRTTIType.GetFields do
