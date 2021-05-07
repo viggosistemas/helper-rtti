@@ -47,13 +47,11 @@ type
   end;
 
   Search = class(TCustomAttribute)
-      constructor Create(ATitle, AKeyWord, AValue: String);
+      constructor Create(AKeyWord, AValue: String);
     private
-      FTitle    : string;
-      FKeyWord  : String;
-      FValue    : String;
+      FKeyWord : String;
+      FValue   : String;
     public
-      property Title   : String read FTitle write FTitle;
       property KeyWord : String read FKeyWord write FKeyWord;
       property Value   : String read FValue   write FValue;
   end;
@@ -77,11 +75,10 @@ end;
 
 { Search }
 
-constructor Search.Create(ATitle, AKeyWord, AValue: String);
+constructor Search.Create(AKeyWord, AValue: String);
 begin
-  FTitle    := ATitle;
-  FKeyWord  := AKeyWord;
-  FValue    := AValue;
+  FKeyWord := AKeyWord;
+  FValue   := AValue;
 end;
 
 end.
