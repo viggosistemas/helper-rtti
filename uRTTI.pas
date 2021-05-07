@@ -6,6 +6,7 @@ uses
   {Basics}
   System.Classes,
   System.SysUtils,
+  System.Generics.Collections,
   Vcl.Forms,
   Vcl.Controls,
 
@@ -38,7 +39,8 @@ type
     function FindObjectFields      ( const AObject: TObject; const AField: String ): TRttiField;
     function FindObjectFieldsValue ( const AObject: TObject; const AField: String ): Variant;
     function FindObject            ( const AObject: TObject; const AField: String ): TObject;
-    function FindAttributeSearch   ( const AObject: TObject; const AField: String = '' ): String;
+    function FindAttributeSearch   ( const AObject: TObject ): TDictionary<String, String>; overload;
+    function FindAttributeSearch   ( const AObject: TObject; const AField: String ): String; overload;
 
     //function CloneFrom<T: class>(Source: T): T;
     //function Clone(const Parameters:Array of TValue): TObject;
@@ -50,6 +52,7 @@ var
 implementation
 
 { TRTTI }
+
 
 constructor TRTTI.Create;
 begin
@@ -69,13 +72,15 @@ begin
   KRTTI  := Result;
 end;
 
-function TRTTI.FindAttributeSearch( const AObject: TObject; const AField: String = '' ): String;
+function TRTTI.FindAttributeSearch( const AObject: TObject; const AField: String ): String;
 var
   LRTTIField     : TRttiField;
   LRTTIMethod    : TRttiMethod;
   LRTTIProperty  : TRttiProperty;
   LRTTIAttributes: TCustomAttribute;
 begin
+  Result := '';
+
   FRTTIType  := FRTTIContext.GetType( TObject( AObject ).ClassType );
 
   if AField <> '' then
@@ -85,38 +90,45 @@ begin
 
     if LRTTIField <> nil then
     begin
+
       for LRTTIAttributes in  LRTTIField.GetAttributes do
       begin
-        if LRTTIAttributes is Search  then
+        if LRTTIAttributes is Search then
           Result := Search(LRTTIAttributes).Value;
 
         if LRTTIAttributes is NumberOnly  then
-          Result := Result + Search(LRTTIAttributes).Value + '::::varchar';
+          Result := Result + '::::varchar';
 
         if LRTTIAttributes is DateOnly then
-        begin
-          Result := 'to_char(' + Result + ', ''DD/MM/YYYY'')'
-
-          //Result := Result + Search(LRTTIAttributes).Value + '::::varchar';
-        end;
+          Result := 'to_char(' + Result + ', ''DD/MM/YYYY'')';
 
       end;
-    end
-    else
-      Result := '';
 
-  end
-  else
-  begin
-    for LRTTIField in FRTTIType.GetFields do
-    begin
-      for LRTTIAttributes in  LRTTIField.GetAttributes do
-      begin
-        if LRTTIAttributes is Search  then
-          Result := Result + Search(LRTTIAttributes).KeyWord + ';';
-      end;
     end;
+
   end;
+
+
+end;
+
+function TRTTI.FindAttributeSearch(const AObject: TObject): TDictionary<String, String>;
+var
+  LRTTIField     : TRttiField;
+  LRTTIMethod    : TRttiMethod;
+  LRTTIProperty  : TRttiProperty;
+  LRTTIAttributes: TCustomAttribute;
+begin
+  Result := TDictionary<String, String>.Create;
+
+  FRTTIType  := FRTTIContext.GetType( TObject( AObject ).ClassType );
+
+  for LRTTIField in FRTTIType.GetFields do
+  begin
+    for LRTTIAttributes in  LRTTIField.GetAttributes do
+      if LRTTIAttributes is Search  then
+        Result.AddOrSetValue(Search(LRTTIAttributes).Title, Search(LRTTIAttributes).KeyWord);
+  end;
+
 end;
 
 function TRTTI.FindMethods(const AObject: TObject; AMethod: String): TRTTIMethod;

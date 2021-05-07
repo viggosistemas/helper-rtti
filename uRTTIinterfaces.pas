@@ -5,6 +5,7 @@ interface
 uses
   {Basics}
   System.Classes,
+  System.Generics.Collections,
 
   {RTTI}
   RTTI,
@@ -24,7 +25,8 @@ type
     function FindObjectFields      ( const AObject: TObject; const AField: String ): TRttiField;
     function FindObjectFieldsValue ( const AObject: TObject; const AField: String ): Variant;
     function FindObject            ( const AObject: TObject; const AField: String ): TObject;
-    function FindAttributeSearch   ( const AObject: TObject; const AField: String = ''): String;
+    function FindAttributeSearch   ( const AObject: TObject ): TDictionary<String, String>; overload;
+    function FindAttributeSearch   ( const AObject: TObject; const AField: String ): String; overload;
 
     //function CloneFrom<T: class>(Source: T): T; static;
     //function Clone(const Parameters:Array of TValue): TObject;
